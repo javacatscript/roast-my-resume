@@ -5,7 +5,7 @@ import { ResultScreen } from '@/components/ResultScreen';
 import type { GameCard } from '@/lib/game';
 
 const card = (text: string, over: Partial<GameCard> = {}): GameCard => ({
-  bullet: { id: 0, text, flags: [{ rule: 'weak-phrase', detail: 'x' }], score: 5 },
+  bullet: { id: 0, text, start: 0, end: text.length, flags: [{ rule: 'weak-phrase', detail: 'x' }], score: 5 },
   status: 'ready', source: 'ai', roast: 'r', rewrite: `Better ${text}`, choice: 'rewrite',
   ...over,
 });
@@ -69,7 +69,7 @@ describe('ResultScreen', () => {
 
   it('skips the praise card and says there was nothing to fix when that is all there is', () => {
     const praise: GameCard = {
-      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', flags: [], score: 0 },
+      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', start: 0, end: 0, flags: [], score: 0 },
       status: 'ready', source: 'canned', roast: 'r', rewrite: 't', choice: 'pending',
     };
     render(<ResultScreen {...props([praise])} />);

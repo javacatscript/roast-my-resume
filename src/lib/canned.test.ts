@@ -10,6 +10,8 @@ const HARD = /fuck|shit|bitch|cunt|nigg|fag/i;
 const bullet = (rule: RuleId, id = 0): ScannedBullet => ({
   id,
   text: 'x',
+  start: 0,
+  end: 1,
   flags: [{ rule, detail: '' }],
   score: 1,
 });
@@ -36,6 +38,8 @@ describe('cannedRoast', () => {
     const b: ScannedBullet = {
       id: 0,
       text: 'x',
+      start: 0,
+      end: 1,
       score: 5,
       flags: [
         { rule: 'too-long', detail: '' },

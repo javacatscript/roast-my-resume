@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { scanBullet, scanResume } from '@/lib/scanner';
 
-const rules = (text: string) => scanBullet({ id: 0, text }).flags.map((f) => f.rule);
+const rules = (text: string) => scanBullet({ id: 0, text, start: 0, end: text.length }).flags.map((f) => f.rule);
 
 describe('scanBullet', () => {
   it.each([
@@ -40,7 +40,7 @@ describe('scanBullet', () => {
   });
 
   it('gives a clean bullet no flags', () => {
-    const b = scanBullet({ id: 0, text: 'Cut p95 latency 38% by caching hot queries' });
+    const b = scanBullet({ id: 0, text: 'Cut p95 latency 38% by caching hot queries', start: 0, end: 41 });
     expect(b.flags).toEqual([]);
     expect(b.score).toBe(0);
   });
@@ -96,12 +96,30 @@ describe('scanResume', () => {
       ].join('\n'),
     );
     expect(r.clean).toBe(true);
+    expect(r.empty).toBe(false);
     expect(r.flagged).toEqual([]);
   });
 
-  it('handles text with no bullets without crashing', () => {
+  it('reports text with no bullets as empty, not clean', () => {
     const r = scanResume('Summary\nSkills\nReact TypeScript');
     expect(r.all).toEqual([]);
-    expect(r.clean).toBe(true);
+    expect(r.empty).toBe(true);
+    expect(r.clean).toBe(false);
+  });
+
+  it('reports arbitrary short text as empty, not clean', () => {
+    const r = scanResume('hello world');
+    expect(r.empty).toBe(true);
+    expect(r.clean).toBe(false);
+  });
+
+  it('does not count a numbered-list marker as a metric', () => {
+    const r = scanResume('1. Improved the checkout flow for customers');
+    expect(r.all[0].flags.map((f) => f.rule)).toContain('no-metric');
+  });
+
+  it('detects a repeated verb behind a symbol-font bullet', () => {
+    const r = scanResume('\uF0B7 Managed the budget of 4 teams\n\uF0B7 Managed 6 vendors across 3 regions');
+    expect(r.all[1].flags.map((f) => f.rule)).toContain('repeated-verb');
   });
 });

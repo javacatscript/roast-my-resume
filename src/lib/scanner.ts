@@ -4,6 +4,9 @@ import type { Bullet, Flag, RuleId, ScannedBullet } from '@/lib/types';
 export interface ScanResult {
   all: ScannedBullet[];
   flagged: ScannedBullet[];
+  /** No bullets could be found in the input at all. */
+  empty: boolean;
+  /** Bullets were found and none of them were flagged. */
   clean: boolean;
 }
 
@@ -55,5 +58,5 @@ export function scanResume(text: string, maxCards = 8): ScanResult {
     .filter((b) => b.flags.length > 0)
     .sort((a, b) => b.score - a.score || a.id - b.id)
     .slice(0, maxCards);
-  return { all, flagged, clean: flagged.length === 0 };
+  return { all, flagged, empty: all.length === 0, clean: all.length > 0 && flagged.length === 0 };
 }

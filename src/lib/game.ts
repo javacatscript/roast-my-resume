@@ -1,4 +1,5 @@
 import { praiseCard } from '@/lib/canned';
+import { normalizeText } from '@/lib/segment';
 import type { ScanResult } from '@/lib/scanner';
 import type { Intensity, ScannedBullet } from '@/lib/types';
 
@@ -55,10 +56,17 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
     case 'start-scan':
       return { ...initialState, phase: 'scanning', intensity: a.intensity };
     case 'scan-done': {
+      if (a.result.empty) {
+        return {
+          ...initialState,
+          intensity: s.intensity,
+          notice: "Couldn't find any bullets in that. Paste your experience section, one bullet per line.",
+        };
+      }
       if (a.result.clean) {
         const p = praiseCard(s.intensity);
         const card: GameCard = {
-          bullet: { id: 0, text: p.original, flags: [], score: 0 },
+          bullet: { id: 0, text: p.original, start: 0, end: 0, flags: [], score: 0 },
           status: 'ready',
           source: 'canned',
           roast: p.roast,
@@ -105,18 +113,29 @@ export function gameReducer(s: GameState, a: GameAction): GameState {
   }
 }
 
-const escapeRegex = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-/** Rebuilds the resume with each chosen AI rewrite or edit swapped in for its bullet. */
+/** Rebuilds the resume with each chosen AI rewrite or edit swapped in for its bullet, by source offset. */
 export function applyChoices(originalText: string, cards: GameCard[]): string {
-  let out = originalText;
-  for (const c of cards) {
-    const replacement =
-      c.choice === 'edited' ? c.edited : c.choice === 'rewrite' && c.source === 'ai' ? c.rewrite : undefined;
-    if (!replacement) continue;
-    const words = c.bullet.text.trim().split(/\s+/).map(escapeRegex);
-    if (!words.join('')) continue;
-    out = out.replace(new RegExp(words.join('\\s+')), () => replacement);
+  const src = normalizeText(originalText);
+  const edits = cards
+    .map((c) => ({
+      start: c.bullet.start,
+      end: c.bullet.end,
+      text:
+        c.choice === 'edited'
+          ? c.edited
+          : c.choice === 'rewrite' && c.source === 'ai'
+            ? c.rewrite
+            : undefined,
+    }))
+    .filter((e): e is { start: number; end: number; text: string } => !!e.text && e.end > e.start)
+    .sort((a, b) => b.start - a.start);
+
+  let out = src;
+  let limit = src.length;
+  for (const e of edits) {
+    if (e.end > limit) continue;
+    out = out.slice(0, e.start) + e.text + out.slice(e.end);
+    limit = e.start;
   }
   return out;
 }

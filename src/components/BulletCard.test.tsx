@@ -6,7 +6,7 @@ import { keepOriginalMock, ruleTip } from '@/lib/canned';
 import type { GameCard } from '@/lib/game';
 
 const base: GameCard = {
-  bullet: { id: 0, text: 'Responsible for stuff', flags: [{ rule: 'weak-phrase', detail: 'x' }], score: 5 },
+  bullet: { id: 0, text: 'Responsible for stuff', start: 0, end: 21, flags: [{ rule: 'weak-phrase', detail: 'x' }], score: 5 },
   status: 'ready', source: 'ai', roast: 'What are you DOING?', rewrite: 'Led a team of [N] engineers',
   choice: 'pending',
 };
@@ -84,7 +84,7 @@ describe('BulletCard', () => {
     const p = props();
     const praise: GameCard = {
       ...base, source: 'canned', rewrite: 'Nothing major to fix.',
-      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', flags: [], score: 0 },
+      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', start: 0, end: 0, flags: [], score: 0 },
     };
     render(<BulletCard card={praise} isLast {...p} />);
     expect(screen.queryByRole('button', { name: /keep original/i })).not.toBeInTheDocument();

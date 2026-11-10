@@ -8,7 +8,11 @@ export type RuleId =
 
 export interface Bullet {
   id: number;
+  /** Bullet text with the marker removed and wrapped lines joined by single spaces. */
   text: string;
+  /** Offsets of the bullet text (without its marker) in the normalized source text. */
+  start: number;
+  end: number;
 }
 export interface Flag {
   rule: RuleId;

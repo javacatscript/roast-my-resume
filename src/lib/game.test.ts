@@ -106,46 +106,85 @@ describe('gameReducer', () => {
     expect(s.phase).toBe('done');
   });
 
+  it('scan-done on an empty scan returns to input with a message, not a praise card', () => {
+    const s = gameReducer(
+      gameReducer(initialState, { type: 'start-scan', intensity: 'mild' }),
+      { type: 'scan-done', result: scanResume('hello world') },
+    );
+    expect(s.phase).toBe('input');
+    expect(s.cards).toEqual([]);
+    expect(s.notice).toMatch(/couldn't find any bullets/i);
+    expect(s.intensity).toBe('mild');
+  });
+
   it('reset returns to the initial state', () => {
     expect(gameReducer(ready(playing()), { type: 'reset' })).toEqual(initialState);
   });
 });
 
 describe('applyChoices', () => {
-  const card = (text: string, over: Partial<GameCard>): GameCard => ({
-    bullet: { id: 0, text, flags: [], score: 1 },
-    status: 'ready', source: 'ai', roast: 'r', rewrite: 'NEW', choice: 'rewrite',
-    ...over,
-  });
+  const build = (text: string, chosen: Record<number, string>): GameCard[] =>
+    scanResume(text).all.map((bullet) => ({
+      bullet, status: 'ready', source: 'ai', roast: 'r',
+      rewrite: chosen[bullet.id] ?? 'unused',
+      choice: bullet.id in chosen ? 'rewrite' : 'pending',
+    }));
 
-  it('swaps in the ai rewrite when it was chosen', () => {
-    expect(applyChoices('• Did a thing\n• Other', [card('Did a thing', {})])).toBe('• NEW\n• Other');
+  it('swaps in the ai rewrite when it was chosen and keeps the bullet marker', () => {
+    const t = '• Did a thing for many users\n• Other thing here for users';
+    expect(applyChoices(t, build(t, { 0: 'NEW' }))).toBe('• NEW\n• Other thing here for users');
   });
 
   it('uses edited text for edited cards', () => {
-    expect(applyChoices('• Did a thing', [card('Did a thing', { choice: 'edited', edited: 'Mine' })])).toBe('• Mine');
+    const t = '• Did a thing for many users';
+    const cards = build(t, {}).map((c) => ({ ...c, choice: 'edited' as const, edited: 'Mine' }));
+    expect(applyChoices(t, cards)).toBe('• Mine');
   });
 
   it('leaves original and pending choices alone', () => {
-    const t = '• Did a thing';
-    expect(applyChoices(t, [card('Did a thing', { choice: 'original' })])).toBe(t);
-    expect(applyChoices(t, [card('Did a thing', { choice: 'pending' })])).toBe(t);
+    const t = '• Did a thing for many users';
+    expect(applyChoices(t, build(t, {}))).toBe(t);
+    const orig = build(t, {}).map((c) => ({ ...c, choice: 'original' as const }));
+    expect(applyChoices(t, orig)).toBe(t);
   });
 
   it('never swaps in a canned tip as if it were a rewrite', () => {
-    const t = '• Did a thing';
-    expect(applyChoices(t, [card('Did a thing', { source: 'canned', choice: 'rewrite' })])).toBe(t);
+    const t = '• Did a thing for many users';
+    const cards = build(t, { 0: 'TIP' }).map((c) => ({ ...c, source: 'canned' as const }));
+    expect(applyChoices(t, cards)).toBe(t);
   });
 
-  it('matches bullets that were wrapped across lines', () => {
+  it('replaces a whole wrapped bullet', () => {
     const t = '• Reduced the cost of cloud\n  infrastructure across regions';
-    const c = card('Reduced the cost of cloud infrastructure across regions', {});
-    expect(applyChoices(t, [c])).toBe('• NEW');
+    expect(applyChoices(t, build(t, { 0: 'NEW' }))).toBe('• NEW');
   });
 
-  it('handles regex characters and $ patterns safely', () => {
-    const t = '• Saved $1.5M (est.) [Q3]';
-    const c = card('Saved $1.5M (est.) [Q3]', { rewrite: 'Saved $& more' });
-    expect(applyChoices(t, [c])).toBe('• Saved $& more');
+  it('replaces the right one of two identical bullets', () => {
+    const t = '• Managed vendor contracts for the team\n• Managed vendor contracts for the team';
+    expect(applyChoices(t, build(t, { 1: 'NEW' }))).toBe(
+      '• Managed vendor contracts for the team\n• NEW',
+    );
+  });
+
+  it('does not touch a longer line that merely contains the bullet text', () => {
+    const t = [
+      '• Built dashboards for the sales team',
+      'Built dashboards for the sales team using React and D3 at scale',
+    ].join('\n');
+    const out = applyChoices(t, build(t, { 0: 'NEW' }));
+    expect(out).toContain('Built dashboards for the sales team using React and D3 at scale');
+    expect(out.startsWith('• NEW\n')).toBe(true);
+  });
+
+  it('does not match inside a rewrite that was already inserted', () => {
+    const t = '• First bullet about many things here\n• Second bullet about other things there';
+    const out = applyChoices(t, build(t, { 0: 'FIRST mentions Second bullet about other things there', 1: 'SECOND' }));
+    expect(out).toBe('• FIRST mentions Second bullet about other things there\n• SECOND');
+  });
+
+  it('normalizes CRLF and handles $ patterns in the replacement', () => {
+    const t = '• Saved money for many users\r\n• Other thing here for users';
+    const out = applyChoices(t, build(t, { 0: 'Saved $& more' }));
+    expect(out).toBe('• Saved $& more\n• Other thing here for users');
   });
 });

@@ -6,7 +6,13 @@ import { MAX_RESUME_CHARS } from '@/lib/limits';
 import { NoTextLayerError, extractPdfText } from '@/lib/pdf';
 import type { Intensity } from '@/lib/types';
 
-export function UploadScreen({ onStart }: { onStart: (text: string, i: Intensity) => void }) {
+export function UploadScreen({
+  onStart,
+  message,
+}: {
+  onStart: (text: string, i: Intensity) => void;
+  message?: string;
+}) {
   const [text, setText] = useState('');
   const [intensity, setIntensity] = useState<Intensity>('high');
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -16,7 +22,7 @@ export function UploadScreen({ onStart }: { onStart: (text: string, i: Intensity
   const tooLong = text.length > MAX_RESUME_CHARS;
   const error = tooLong
     ? `That's too long. Keep it under ${MAX_RESUME_CHARS.toLocaleString()} characters.`
-    : pdfError;
+    : (pdfError ?? message ?? null);
   const canStart = text.trim().length > 0 && !tooLong && !busy;
 
   async function onFile(file: File | undefined) {

@@ -18,6 +18,7 @@ export default function Home() {
   if (state.phase === 'input') {
     return (
       <UploadScreen
+        message={state.notice}
         onStart={(text, intensity) => {
           setOriginal(text);
           game.start(text, intensity);
