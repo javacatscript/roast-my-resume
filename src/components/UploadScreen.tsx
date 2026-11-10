@@ -46,7 +46,7 @@ export function UploadScreen({
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-6 py-12">
       <header>
         <h1 className="text-5xl font-black tracking-tight">
-          Resume <span className="text-roast drop-shadow-[0_0_18px_var(--roast)]">Roast</span>
+          <span className="text-roast drop-shadow-[0_0_18px_var(--roast)]">Roast</span> my resume
         </h1>
         <p className="mt-3 text-muted">
           Drop in your resume. Every weak bullet gets roasted, then fixed. Brace yourself.
@@ -105,10 +105,6 @@ export function UploadScreen({
           Start the roast
         </button>
       </div>
-
-      <p className="text-xs text-muted">
-        Your resume is sent to Groq to generate the roast. It isn&apos;t stored.
-      </p>
     </main>
   );
 }

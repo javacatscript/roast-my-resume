@@ -2,9 +2,9 @@
 import type { Intensity } from '@/lib/types';
 
 const OPTIONS: { value: Intensity; label: string; hint: string }[] = [
-  { value: 'mild', label: 'Mild', hint: 'gentle teasing' },
-  { value: 'medium', label: 'Medium', hint: 'sarcastic' },
-  { value: 'high', label: 'High', hint: 'no mercy' },
+  { value: 'mild', label: 'Mild', hint: '' },
+  { value: 'medium', label: 'Medium', hint: '' },
+  { value: 'high', label: 'High', hint: '' },
 ];
 
 export function IntensityToggle({
