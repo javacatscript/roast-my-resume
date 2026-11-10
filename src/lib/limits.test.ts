@@ -23,7 +23,7 @@ describe('validateRoastRequest', () => {
   });
 
   it('rejects a missing bullet', () => {
-    const { bullet: _omit, ...rest } = valid;
+    const rest = { flags: valid.flags, intensity: valid.intensity };
     expect(validateRoastRequest(rest).ok).toBe(false);
   });
 

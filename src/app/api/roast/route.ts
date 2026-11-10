@@ -2,8 +2,6 @@ import { checkLimit } from '@/lib/ratelimit';
 import { validateRoastRequest } from '@/lib/limits';
 import { buildMessages } from '@/lib/prompt';
 
-export const runtime = 'nodejs';
-
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 // Confirm the current free-tier model id in the Groq console; override with GROQ_MODEL.
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile';

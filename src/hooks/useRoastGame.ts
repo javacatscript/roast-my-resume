@@ -13,7 +13,9 @@ const PRIORITY: RuleId[] = ['weak-phrase', 'no-metric', 'passive', 'repeated-ver
 export function useRoastGame({ scanDelayMs = 1500 }: { scanDelayMs?: number } = {}) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
   const runId = useRef(0);
   const abort = useRef<AbortController | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -95,6 +97,6 @@ export function useRoastGame({ scanDelayMs = 1500 }: { scanDelayMs?: number } = 
       cancelAll();
       dispatch({ type: 'reset' });
     },
-    finalText: (originalText: string) => applyChoices(originalText, stateRef.current.cards),
+    finalText: (originalText: string) => applyChoices(originalText, state.cards),
   };
 }
