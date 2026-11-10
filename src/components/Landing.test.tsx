@@ -40,6 +40,11 @@ describe('Landing', () => {
     expect(list.children).toHaveLength(4);
   });
 
+  it('still discloses that the text goes to Groq and is not stored', () => {
+    render(<Landing onStart={() => {}} reducedMotion />);
+    expect(screen.getByText(/sent to Groq to write the roast/i)).toBeInTheDocument();
+  });
+
   it('shows the sample message passed in from a failed scan above the form', () => {
     render(<Landing onStart={() => {}} reducedMotion message="Couldn't find any bullets in that." />);
     expect(screen.getByRole('alert')).toHaveTextContent(/couldn't find any bullets/i);

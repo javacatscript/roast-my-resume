@@ -57,10 +57,8 @@ describe('UploadScreen', () => {
     );
   });
 
-  it('states the privacy line', () => {
+  it('keeps the form itself free of the privacy footnote', () => {
     render(<UploadScreen onStart={() => {}} />);
-    expect(
-      screen.getByText("Your resume is sent to Groq to generate the roast. It isn't stored."),
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/sent to Groq/i)).not.toBeInTheDocument();
   });
 });

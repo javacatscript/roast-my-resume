@@ -93,7 +93,6 @@ export function UploadScreen({
         </button>
       </div>
 
-      <p className="mt-4 text-xs text-muted">Your resume is sent to Groq to generate the roast. It isn&apos;t stored.</p>
     </div>
   );
 }

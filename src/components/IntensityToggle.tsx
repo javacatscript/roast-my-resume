@@ -1,10 +1,10 @@
 'use client';
 import type { Intensity } from '@/lib/types';
 
-const OPTIONS: { value: Intensity; label: string; hint: string }[] = [
-  { value: 'mild', label: 'Mild', hint: 'gentle teasing' },
-  { value: 'medium', label: 'Medium', hint: 'sarcastic' },
-  { value: 'high', label: 'High', hint: 'no mercy' },
+const OPTIONS: { value: Intensity; label: string }[] = [
+  { value: 'mild', label: 'Mild' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
 ];
 
 export function IntensityToggle({ value, onChange }: { value: Intensity; onChange: (i: Intensity) => void }) {
@@ -34,7 +34,6 @@ export function IntensityToggle({ value, onChange }: { value: Intensity; onChang
             }`}
           >
             {o.label}
-            <span className="ml-1.5 hidden text-xs font-normal opacity-80 md:inline">{o.hint}</span>
           </button>
         );
       })}
