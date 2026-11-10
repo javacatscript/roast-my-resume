@@ -8,6 +8,9 @@
   --surface: #1a1513;
   --surface-2: #261e1b;
   --line: #3a2e29;
+  --edge: #cbbdb4; /* heavy ink border */
+  --shadow-color: #ff6a3d; /* hard offset shadow */
+  --paper-shadow: #ff6a3d;
   --text: #f6efea;
   --muted: #a99d96;
   --fire: #ff6a3d;
@@ -16,12 +19,10 @@
   --roast: #ff6b5b;
   --rewrite: #46e0a0;
   --on-fire: #1a0d08;
-  --hero-bg:
-    radial-gradient(60% 55% at 78% 28%, rgba(255, 98, 32, 0.3), transparent 70%),
-    radial-gradient(40% 40% at 8% 90%, rgba(255, 61, 46, 0.14), transparent 70%), var(--bg);
+  --hero-flat: #0e0b0a;
   --hero-text: #f6efea;
   --hero-muted: #c9bdb6;
-  --glow: 0 0 44px -10px rgba(255, 98, 32, 0.55);
+  --dot: rgba(255, 106, 61, 0.38);
 }
 
 :root[data-theme='light'] {
@@ -30,6 +31,9 @@
   --surface: #ffffff;
   --surface-2: #f3efec;
   --line: #e3dcd7;
+  --edge: #1b1412;
+  --shadow-color: #1b1412;
+  --paper-shadow: #1b1412;
   --text: #1b1412;
   --muted: #655953;
   --fire: #c2410c;
@@ -38,10 +42,10 @@
   --roast: #c2261f;
   --rewrite: #0b7a55;
   --on-fire: #ffffff;
-  --hero-bg: linear-gradient(135deg, #d9480f 0%, #c2261f 100%);
+  --hero-flat: #c2410c;
   --hero-text: #ffffff;
   --hero-muted: #ffe9df;
-  --glow: 0 18px 40px -18px rgba(120, 30, 10, 0.5);
+  --dot: rgba(70, 12, 0, 0.3);
 }
 
 @theme inline {
@@ -49,6 +53,7 @@
   --color-surface: var(--surface);
   --color-surface2: var(--surface-2);
   --color-line: var(--line);
+  --color-edge: var(--edge);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-fire: var(--fire);
@@ -57,6 +62,7 @@
   --color-onfire: var(--on-fire);
   --font-sans: var(--font-ui), system-ui, sans-serif;
   --font-doc: var(--font-document), Georgia, serif;
+  --font-pen: var(--font-handwriting), 'Segoe Script', cursive;
 }
 
 body {
@@ -76,18 +82,129 @@ body {
   color: var(--on-fire);
 }
 
-@keyframes ember-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(1);
-  }
-  15% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-46px) translateX(var(--drift, 0px)) scale(0.2);
-  }
+/* ---------- Flat print: heavy borders and hard offset shadows instead of glows ---------- */
+.btn {
+  border: 2px solid var(--edge);
+  border-radius: 5px;
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  transition: transform 80ms, box-shadow 80ms;
+}
+.btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+}
+.btn:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--shadow-color);
+}
+.btn:disabled {
+  box-shadow: none;
+  opacity: 0.45;
+}
+
+.panel {
+  border: 2px solid var(--edge);
+  border-radius: 6px;
+  background: var(--surface);
+  box-shadow: 6px 6px 0 var(--shadow-color);
+}
+
+/* ---------- Paper: grain, ink border, and its own fixed ink colours in either theme ---------- */
+.paper {
+  --text: #1b1412;
+  --muted: #6b5f58;
+  --surface: #fffdf9;
+  --surface-2: #efe7df;
+  --line: #d8cdc4;
+  --edge: #1b1412;
+  --shadow-color: #1b1412;
+  --roast: #c2261f;
+  --rewrite: #0b6b4a;
+  color: var(--text);
+  background-color: #fffdf9;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .22  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  border: 2px solid #1b1412;
+  border-radius: 3px;
+  box-shadow: 6px 6px 0 var(--paper-shadow);
+}
+
+/* A torn bottom edge, drawn as its own strip so the paper can keep a clean border. */
+.torn-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -11px;
+  height: 13px;
+  background-color: #fffdf9;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 96% 80%, 91% 40%, 86% 92%, 80% 36%, 74% 86%, 68% 46%, 62% 96%, 55% 30%, 48% 82%, 41% 40%, 35% 92%, 28% 36%, 21% 86%, 14% 46%, 8% 92%, 3% 40%, 0 72%);
+}
+
+/* A faint coffee ring, broken like a real one. */
+.coffee-ring {
+  position: absolute;
+  width: 6.5rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 55%, rgba(120, 72, 36, 0.2) 57%, rgba(120, 72, 36, 0.09) 63%, transparent 67%);
+  -webkit-mask-image: conic-gradient(from 25deg, #000 0 290deg, transparent 290deg);
+  mask-image: conic-gradient(from 25deg, #000 0 290deg, transparent 290deg);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* ---------- Red pen ---------- */
+mark.pen {
+  background-color: transparent;
+  color: inherit;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='8' viewBox='0 0 24 8'><path d='M0 5 Q3 1 6 5 T12 4.5 T18 5 T24 4' fill='none' stroke='%23e0392b' stroke-width='2' stroke-linecap='round'/></svg>");
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 24px 8px;
+  padding-bottom: 5px;
+}
+
+/* ---------- Rubber stamp ---------- */
+.stamp {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border: 4px double currentColor;
+  border-radius: 6px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  mix-blend-mode: multiply;
+  filter: url(#rough);
+  user-select: none;
+}
+.stamp-bad {
+  color: #c2261f;
+}
+.stamp-good,
+.stamp-clean {
+  color: #0b6b4a;
+}
+.stamp-mid {
+  color: #b45309;
+}
+
+/* ---------- Hero: flat colour with a printed halftone ---------- */
+.hero {
+  position: relative;
+  background-color: var(--hero-flat);
+  color: var(--hero-text);
+  border-bottom: 2px solid var(--edge);
+  isolation: isolate;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(circle, var(--dot) 1.3px, transparent 1.8px);
+  background-size: 15px 15px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 38%, #000 100%);
+  mask-image: linear-gradient(100deg, transparent 38%, #000 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

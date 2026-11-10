@@ -9,7 +9,7 @@ const OPTIONS: { value: Intensity; label: string }[] = [
 
 export function IntensityToggle({ value, onChange }: { value: Intensity; onChange: (i: Intensity) => void }) {
   return (
-    <div role="radiogroup" aria-label="Roast intensity" className="inline-flex rounded-xl border border-line bg-surface2 p-1">
+    <div role="radiogroup" aria-label="Roast intensity" className="inline-flex rounded-md border-2 border-edge bg-surface2 p-1">
       {OPTIONS.map((o, i) => {
         const active = o.value === value;
         return (
@@ -29,8 +29,8 @@ export function IntensityToggle({ value, onChange }: { value: Intensity; onChang
               (e.currentTarget.parentElement?.querySelector(`[data-v="${next}"]`) as HTMLElement | null)?.focus();
             }}
             data-v={o.value}
-            className={`whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-fire ${
-              active ? 'fire-fill shadow-[var(--glow)]' : 'text-muted hover:text-text'
+            className={`whitespace-nowrap rounded-[4px] px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-fire ${
+              active ? 'fire-fill' : 'text-muted hover:text-text'
             }`}
           >
             {o.label}

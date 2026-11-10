@@ -20,12 +20,18 @@ const props = (cards: GameCard[]) => ({
 afterEach(() => vi.restoreAllMocks());
 
 describe('ResultScreen', () => {
-  it('shows before and after for every card', () => {
+  it('shows before and after for a changed bullet, and just the text for one kept as written', () => {
     render(<ResultScreen {...props([card('one'), card('two', { choice: 'original' })])} />);
-    expect(screen.getAllByText('one').length).toBeGreaterThan(0);
     expect(screen.getByText('Better one')).toBeInTheDocument();
-    expect(screen.getAllByText(/before/i)).toHaveLength(2);
-    expect(screen.getAllByText(/after/i)).toHaveLength(2);
+    expect(screen.getAllByText('Before')).toHaveLength(1);
+    expect(screen.getAllByText('After')).toHaveLength(1);
+    expect(screen.getByText('Kept as written')).toBeInTheDocument();
+    expect(screen.getAllByText('two')).toHaveLength(1);
+  });
+
+  it('does not strike through a bullet that was kept', () => {
+    const { container } = render(<ResultScreen {...props([card('two', { choice: 'original' })])} />);
+    expect(container.querySelector('.line-through')).toBeNull();
   });
 
   it('badges only ai rewrites that were kept, not canned or original', () => {
@@ -75,5 +81,16 @@ describe('ResultScreen', () => {
     render(<ResultScreen {...props([praise])} />);
     expect(screen.queryByText('Your resume, which turned out to be fine.')).not.toBeInTheDocument();
     expect(screen.getByText(/nothing to fix/i)).toBeInTheDocument();
+  });
+
+  it('stamps a verdict on a cover sheet with the counts', () => {
+    render(<ResultScreen {...props([card('one'), card('two'), card('three'), card('four', { choice: 'original' })])} />);
+    expect(screen.getByRole('img', { name: 'Verdict: Shortlisted' })).toBeInTheDocument();
+    expect(screen.getByText(/3 of 4 bullets changed/i)).toBeInTheDocument();
+  });
+
+  it('stamps rejected when most originals were kept', () => {
+    render(<ResultScreen {...props([card('one', { choice: 'original' }), card('two', { choice: 'original' })])} />);
+    expect(screen.getByRole('img', { name: 'Verdict: Rejected' })).toBeInTheDocument();
   });
 });

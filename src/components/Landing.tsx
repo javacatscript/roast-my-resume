@@ -14,7 +14,7 @@ function Highlighted({ text, hit }: { text: string; hit: string }) {
   return (
     <>
       {text.slice(0, i)}
-      <mark className="rounded-sm bg-roast/15 px-0.5 text-roast">{hit}</mark>
+      <mark className="pen">{hit}</mark>
       {text.slice(i + hit.length)}
     </>
   );
@@ -33,7 +33,7 @@ export function Landing({
     <>
       <SiteNav showLinks />
       <main>
-        <section style={{ background: 'var(--hero-bg)', color: 'var(--hero-text)' }}>
+        <section className="hero">
           <div className="mx-auto grid max-w-6xl gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
             <div>
               <h1 className="text-5xl font-extrabold leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.25rem]">
@@ -69,7 +69,7 @@ export function Landing({
           </ol>
         </section>
 
-        <section id="checks" className="border-y border-line bg-surface" aria-labelledby="checks-h">
+        <section id="checks" className="border-y-2 border-edge bg-surface" aria-labelledby="checks-h">
           <div className={section}>
             <h2 id="checks-h" className={h2}>
               What it checks

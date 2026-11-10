@@ -10,17 +10,19 @@ describe('HeroDemo', () => {
   });
 
   it('holds the finished frame under reduced motion: struck original, roast and rewrite all visible', () => {
-    render(<HeroDemo reducedMotion />);
-    expect(screen.getByText(DEMO.bad)).toBeInTheDocument();
+    const { container } = render(<HeroDemo reducedMotion />);
+    expect(container).toHaveTextContent(DEMO.bad);
+    expect(container.querySelector('mark')).not.toBeNull();
     expect(screen.getByText(DEMO.roast)).toBeInTheDocument();
     expect(screen.getByText(DEMO.rewrite)).toBeInTheDocument();
   });
 
   it('starts clean when motion is allowed: no roast or rewrite yet', () => {
-    render(<HeroDemo reducedMotion={false} />);
+    const { container } = render(<HeroDemo reducedMotion={false} />);
     expect(screen.queryByText(DEMO.rewrite)).not.toBeInTheDocument();
     expect(screen.queryByText(DEMO.roast)).not.toBeInTheDocument();
-    expect(screen.getByText(DEMO.bad)).toBeInTheDocument();
+    expect(container).toHaveTextContent(DEMO.bad);
+    expect(container.querySelector('mark')).toBeNull();
   });
 
   it('sits square on the page, with no rotation', () => {

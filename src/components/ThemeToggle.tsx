@@ -22,7 +22,7 @@ export function ThemeToggle() {
         document.documentElement.dataset.theme = next;
         storeTheme(next);
       }}
-      className="grid size-10 place-items-center rounded-xl border border-line bg-surface text-text transition hover:border-fire focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire"
+      className="btn grid size-10 place-items-center bg-surface text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire"
     >
       {theme === 'dark' ? (
         <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

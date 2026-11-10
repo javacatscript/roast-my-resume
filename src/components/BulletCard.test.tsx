@@ -136,4 +136,54 @@ describe('BulletCard', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Led a team of [N] engineers');
     });
   });
+
+  describe('red pen', () => {
+    it('underlines the weak phrase in the original bullet', () => {
+      const { container } = render(<BulletCard card={base} {...props()} />);
+      const m = container.querySelector('mark');
+      expect(m).not.toBeNull();
+      expect(m).toHaveTextContent('Responsible for');
+    });
+
+    it('writes the roast as a margin note', () => {
+      const { container } = render(<BulletCard card={base} {...props()} />);
+      expect(container.querySelector('[data-note]')).toHaveTextContent('What are you DOING?');
+    });
+
+    it('stamps REJECTED when the original was kept', () => {
+      render(<BulletCard card={{ ...base, choice: 'original' }} {...props()} />);
+      expect(screen.getByRole('img', { name: 'Verdict: Rejected' })).toBeInTheDocument();
+    });
+
+    it('does not stamp before a choice is made', () => {
+      render(<BulletCard card={base} {...props()} />);
+      expect(screen.queryByRole('img', { name: /verdict/i })).not.toBeInTheDocument();
+    });
+
+    it('stamps the praise card as clean paper', () => {
+      const praise: GameCard = {
+        ...base, source: 'canned', rewrite: 'Nothing major to fix.',
+        bullet: { id: 0, text: 'Your resume, which turned out to be fine.', start: 0, end: 0, flags: [], score: 0 },
+      };
+      render(<BulletCard card={praise} {...props()} />);
+      expect(screen.getByRole('img', { name: 'Verdict: Clean paper' })).toBeInTheDocument();
+    });
+
+    it('keeps the bullet text clear of the stamp', () => {
+      const { container } = render(<BulletCard card={{ ...base, choice: 'original' }} {...props()} />);
+      const text = container.querySelector('mark')!.closest('p')!;
+      expect(text.className).toMatch(/\bpr-3\d\b|\bsm:pr-3\d\b/);
+    });
+
+    it('leaves the bullet text full width when nothing is stamped', () => {
+      const { container } = render(<BulletCard card={base} {...props()} />);
+      const text = container.querySelector('mark')!.closest('p')!;
+      expect(text.className).not.toMatch(/\bpr-/);
+    });
+
+    it('fades the rewrite the user rejected', () => {
+      render(<BulletCard card={{ ...base, choice: 'original' }} {...props()} />);
+      expect(screen.getByText(base.rewrite).closest('[data-rewrite]')).toHaveClass('opacity-50');
+    });
+  });
 });

@@ -7,7 +7,7 @@ import { NoTextLayerError, extractPdfText } from '@/lib/pdf';
 import type { Intensity } from '@/lib/types';
 
 const secondary =
-  'cursor-pointer rounded-xl border border-line bg-surface2 px-4 py-2.5 text-sm font-semibold text-text transition hover:border-fire focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-fire';
+  'btn cursor-pointer bg-surface2 px-4 py-2.5 text-sm font-semibold text-text focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-fire';
 
 export function UploadScreen({
   onStart,
@@ -48,14 +48,14 @@ export function UploadScreen({
   }
 
   return (
-    <div className="rounded-[1.5rem] border border-line bg-surface p-4 text-text shadow-[var(--glow)] sm:p-5">
+    <div className="panel p-4 text-text sm:p-5">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste your resume here, one bullet per line…"
         aria-label="Resume text"
         rows={4}
-        className="w-full resize-y rounded-xl border border-line bg-bg p-4 text-[15px] leading-relaxed text-text placeholder:text-muted focus-visible:outline-2 focus-visible:outline-fire"
+        className="w-full resize-y rounded-[5px] border-2 border-edge bg-bg p-4 text-[15px] leading-relaxed text-text placeholder:text-muted focus-visible:outline-2 focus-visible:outline-fire"
       />
 
       <div className="mt-3 flex flex-wrap items-center gap-2.5">
@@ -87,7 +87,7 @@ export function UploadScreen({
           type="button"
           disabled={!canStart}
           onClick={() => onStart(text, intensity)}
-          className="fire-fill rounded-xl px-6 py-3 font-bold transition enabled:hover:-translate-y-0.5 enabled:hover:shadow-[var(--glow)] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire"
+          className="btn fire-fill px-6 py-3 font-bold disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire"
         >
           Let&apos;s Begin
         </button>

@@ -54,7 +54,7 @@ export default function Home() {
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 py-10 sm:px-8">
             <BossBar current={state.index + 1} total={state.cards.length} />
             {state.notice && (
-              <p role="status" className="rounded-xl border border-line bg-surface2 px-4 py-2.5 text-sm text-muted">
+              <p role="status" className="rounded-md border-2 border-edge bg-surface2 px-4 py-2.5 text-sm text-muted">
                 {state.notice}
               </p>
             )}

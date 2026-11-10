@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
+import { Marked } from '@/components/Marked';
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { markSpans } from '@/lib/scanner';
 
 export const DEMO = {
   good: 'Cut dashboard load time 42% by lazy-loading charts and images',
@@ -13,7 +15,7 @@ export const DEMO = {
 
 // 0 scanning, 1 roasting, 2 fixing, 3 holding the finished frame
 const PHASE_MS = [1700, 2400, 2300, 3600];
-const EMBERS = [8, 22, 38, 54, 68, 82].map((left, i) => ({ left, delay: i * 0.12, drift: (i % 2 ? 1 : -1) * (6 + i * 3) }));
+const BAD_MARKS = markSpans(DEMO.bad, [{ rule: 'weak-phrase', detail: '' }]);
 
 export function HeroDemo({ reducedMotion }: { reducedMotion: boolean }) {
   const [phase, setPhase] = useState(0);
@@ -26,15 +28,22 @@ export function HeroDemo({ reducedMotion }: { reducedMotion: boolean }) {
 
   const shown = reducedMotion ? 3 : phase;
   const roast = useTypewriter(DEMO.roast, shown === 1, 18);
-  const struck = shown >= 1;
+  const marked = shown >= 1;
+  const replaced = shown >= 2;
 
   return (
     <div
       role="img"
       aria-label={`Example: the bullet "${DEMO.bad}" gets roasted and rewritten as "${DEMO.rewrite}".`}
-      className="relative mx-auto w-full max-w-[34rem]"
+      className="relative mx-auto w-full max-w-[34rem] [filter:drop-shadow(6px_6px_0_var(--paper-shadow))]"
     >
-      <div className="doc relative overflow-hidden rounded-md bg-[#fffdf9] p-7 text-[#1b1412] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)] sm:p-9" aria-hidden>
+      {/* paperclip */}
+      <svg aria-hidden className="absolute -top-4 left-9 z-10" width="22" height="52" viewBox="0 0 22 52" fill="none" stroke="#8a8f98" strokeWidth="2.4" strokeLinecap="round">
+        <path d="M15 12v27a6 6 0 0 1-12 0V9a8 8 0 0 1 16 0v28a3.5 3.5 0 0 1-7 0V14" />
+      </svg>
+
+      <div className="paper doc relative overflow-hidden !border-b-0 !shadow-none p-7 pb-9 text-[#1b1412] sm:p-9 sm:pb-11" aria-hidden>
+        <span className="coffee-ring -right-5 bottom-4" />
         <p className="text-2xl font-semibold tracking-tight">John Doe</p>
         <p className="text-sm text-[#6b5f58]">Software engineer</p>
         <hr className="my-4 border-[#e6ddd6]" />
@@ -49,45 +58,35 @@ export function HeroDemo({ reducedMotion }: { reducedMotion: boolean }) {
             <div className="flex gap-3">
               <span className="text-[#9b8f88]">•</span>
               <motion.span
-                animate={{ opacity: struck ? 0.55 : 1 }}
+                animate={{ opacity: replaced ? 0.5 : 1 }}
                 transition={{ duration: 0.4 }}
-                className={struck ? 'text-[#7a6d65] line-through decoration-[#d92d20] decoration-2' : ''}
+                className={replaced ? 'line-through decoration-[#c2261f] decoration-2' : ''}
               >
-                {DEMO.bad}
+                <Marked text={DEMO.bad} spans={marked ? BAD_MARKS : []} />
               </motion.span>
             </div>
 
-            {shown === 1 && !reducedMotion && (
-              <div className="pointer-events-none absolute inset-x-0 -top-1 h-8">
-                {EMBERS.map((e, i) => (
-                  <span
-                    key={i}
-                    className="absolute top-3 size-1.5 rounded-full bg-gradient-to-t from-[#d92d20] to-[#ff9a1f]"
-                    style={{
-                      left: `${e.left}%`,
-                      animation: `ember-rise 1.2s ${e.delay}s ease-out infinite`,
-                      ['--drift' as string]: `${e.drift}px`,
-                    }}
-                  />
-                ))}
+            {shown >= 1 && (
+              <div className="mt-2 flex gap-2 pl-5 font-pen text-[1.35rem] leading-[1.1] text-[#c2261f]">
+                <svg aria-hidden className="mt-1 shrink-0" width="26" height="22" viewBox="0 0 26 22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M24 19C12 19 5 13 3 3M3 3l-1.5 6M3 3l6 2" />
+                </svg>
+                <p>{shown >= 2 ? DEMO.roast : roast}</p>
               </div>
             )}
 
-            {shown >= 1 && (
-              <p className="mt-2 border-l-2 border-[#d92d20] pl-3 font-sans text-[13px] font-medium leading-snug text-[#c2261f]">
-                {shown >= 2 ? DEMO.roast : roast}
-              </p>
-            )}
-
             {shown >= 2 && (
-              <motion.p
+              <motion.div
                 initial={reducedMotion ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                className="mt-3 rounded-sm bg-[#d8f5e8] px-2.5 py-1.5 text-[#0b5c40]"
+                className="relative mt-4 pl-5"
               >
-                {DEMO.rewrite}
-              </motion.p>
+                <svg aria-hidden className="absolute left-0 top-0 -translate-y-3.5" width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="#0b6b4a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 13L9 3l7 10" />
+                </svg>
+                <p className="rounded-sm bg-[#d8f5e8] px-2.5 py-1.5 text-[#0b5c40]">{DEMO.rewrite}</p>
+              </motion.div>
             )}
           </li>
 
@@ -99,13 +98,15 @@ export function HeroDemo({ reducedMotion }: { reducedMotion: boolean }) {
 
         {shown === 0 && !reducedMotion && (
           <motion.div
-            className="pointer-events-none absolute inset-x-0 h-16 bg-gradient-to-b from-transparent via-[#ff6a3d]/35 to-transparent"
-            initial={{ top: '-12%' }}
-            animate={{ top: '102%' }}
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 h-[3px] bg-[#e0392b]"
+            initial={{ top: '-2%' }}
+            animate={{ top: '100%' }}
             transition={{ duration: 1.5, ease: 'easeInOut' }}
           />
         )}
       </div>
+      <div aria-hidden className="torn-edge" />
     </div>
   );
 }

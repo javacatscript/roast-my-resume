@@ -30,6 +30,35 @@ function withScore(b: Bullet, flags: Flag[]): ScannedBullet {
   return { ...b, flags, score: flags.reduce((n, f) => n + WEIGHTS[f.rule], 0) };
 }
 
+export interface Mark {
+  start: number;
+  end: number;
+}
+
+/** Where a red pen would point: the exact words behind each flag that has a phrase to mark. */
+export function markSpans(text: string, flags: Flag[]): Mark[] {
+  const marks: Mark[] = [];
+  const has = (r: RuleId) => flags.some((f) => f.rule === r);
+  const push = (m: RegExpMatchArray | null) => {
+    if (m && m.index !== undefined) marks.push({ start: m.index, end: m.index + m[0].length });
+  };
+  if (has('weak-phrase')) push(text.match(WEAK_PHRASE));
+  if (has('passive')) push(text.match(PASSIVE));
+  if (has('repeated-verb')) push(text.match(/^\S+/));
+  if (has('too-long') && text.length > TOO_LONG) {
+    const start = text.lastIndexOf(' ', TOO_LONG) + 1;
+    if (start > 0 && start < text.length) marks.push({ start, end: text.length });
+  }
+  marks.sort((a, b) => a.start - b.start || a.end - b.end);
+  const merged: Mark[] = [];
+  for (const m of marks) {
+    const last = merged[merged.length - 1];
+    if (last && m.start <= last.end) last.end = Math.max(last.end, m.end);
+    else merged.push({ ...m });
+  }
+  return merged;
+}
+
 export function scanBullet(b: Bullet): ScannedBullet {
   const flags: Flag[] = [];
   const weak = b.text.match(WEAK_PHRASE);
