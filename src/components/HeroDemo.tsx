@@ -32,11 +32,11 @@ export function HeroDemo({ reducedMotion }: { reducedMotion: boolean }) {
     <div
       role="img"
       aria-label={`Example: the bullet "${DEMO.bad}" gets roasted and rewritten as "${DEMO.rewrite}".`}
-      className="relative mx-auto w-full max-w-[34rem] lg:rotate-[1.2deg]"
+      className="relative mx-auto w-full max-w-[34rem]"
     >
       <div className="doc relative overflow-hidden rounded-md bg-[#fffdf9] p-7 text-[#1b1412] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)] sm:p-9" aria-hidden>
-        <p className="text-2xl font-semibold tracking-tight">Jordan Example</p>
-        <p className="text-sm text-[#6b5f58]">Frontend engineer</p>
+        <p className="text-2xl font-semibold tracking-tight">John Doe</p>
+        <p className="text-sm text-[#6b5f58]">Software engineer</p>
         <hr className="my-4 border-[#e6ddd6]" />
 
         <ul className="space-y-4 text-[15px] leading-snug sm:text-base">

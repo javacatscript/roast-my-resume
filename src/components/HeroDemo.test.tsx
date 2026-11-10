@@ -22,4 +22,9 @@ describe('HeroDemo', () => {
     expect(screen.queryByText(DEMO.roast)).not.toBeInTheDocument();
     expect(screen.getByText(DEMO.bad)).toBeInTheDocument();
   });
+
+  it('sits square on the page, with no rotation', () => {
+    const { container } = render(<HeroDemo reducedMotion />);
+    expect(container.innerHTML).not.toMatch(/rotate-\[|-rotate-|\brotate-\d/);
+  });
 });
