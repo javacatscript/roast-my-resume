@@ -66,4 +66,14 @@ describe('ResultScreen', () => {
     await userEvent.click(screen.getByRole('button', { name: /start over/i }));
     expect(p.onReset).toHaveBeenCalled();
   });
+
+  it('skips the praise card and says there was nothing to fix when that is all there is', () => {
+    const praise: GameCard = {
+      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', flags: [], score: 0 },
+      status: 'ready', source: 'canned', roast: 'r', rewrite: 't', choice: 'pending',
+    };
+    render(<ResultScreen {...props([praise])} />);
+    expect(screen.queryByText('Your resume, which turned out to be fine.')).not.toBeInTheDocument();
+    expect(screen.getByText(/nothing to fix/i)).toBeInTheDocument();
+  });
 });

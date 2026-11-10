@@ -107,9 +107,10 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             </button>
           </div>
         </div>
-      ) : decided ? (
+      ) : decided || praise ? (
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted">
+            {praise && 'Go on, enjoy it.'}
             {card.choice === 'original' && keepOriginalMock(intensity)}
             {card.choice === 'rewrite' && 'Rewrite locked in.'}
             {card.choice === 'edited' && 'Your edit is saved.'}

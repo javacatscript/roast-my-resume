@@ -79,4 +79,17 @@ describe('BulletCard', () => {
     expect(container.querySelector('[data-reduced-motion="true"]')).not.toBeNull();
     expect(container.querySelector('[data-shake="true"]')).toBeNull();
   });
+
+  it('shows only a continue button on the praise card, with no keep or edit choices', async () => {
+    const p = props();
+    const praise: GameCard = {
+      ...base, source: 'canned', rewrite: 'Nothing major to fix.',
+      bullet: { id: 0, text: 'Your resume, which turned out to be fine.', flags: [], score: 0 },
+    };
+    render(<BulletCard card={praise} isLast {...p} />);
+    expect(screen.queryByRole('button', { name: /keep original/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /see results/i }));
+    expect(p.onNext).toHaveBeenCalled();
+  });
 });

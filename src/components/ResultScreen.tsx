@@ -18,7 +18,8 @@ function afterText(c: GameCard): { text: string; aiRewrite: boolean } {
 const btn =
   'rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold transition hover:border-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white';
 
-export function ResultScreen({ cards, finalText, onReset }: Props) {
+export function ResultScreen({ cards: allCards, finalText, onReset }: Props) {
+  const cards = allCards.filter((c) => c.bullet.flags.length > 0);
   function download() {
     const url = URL.createObjectURL(new Blob([finalText], { type: 'text/plain' }));
     const a = document.createElement('a');
@@ -36,6 +37,12 @@ export function ResultScreen({ cards, finalText, onReset }: Props) {
         </h2>
         <p className="mt-2 text-muted">Here is what changed. Copy it, download it, or go again.</p>
       </header>
+
+      {cards.length === 0 && (
+        <p className="rounded-xl border border-rewrite/30 bg-rewrite/10 p-4 text-rewrite">
+          Nothing to fix. Your resume survived the roast untouched.
+        </p>
+      )}
 
       <ul className="flex flex-col gap-4">
         {cards.map((c, i) => {
