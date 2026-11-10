@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { AnimatePresence, useReducedMotion } from 'motion/react';
 import { BossBar } from '@/components/BossBar';
 import { BulletCard } from '@/components/BulletCard';
+import { ResultScreen } from '@/components/ResultScreen';
 import { ScanView } from '@/components/ScanView';
 import { UploadScreen } from '@/components/UploadScreen';
 import { useRoastGame } from '@/hooks/useRoastGame';
@@ -29,12 +30,12 @@ export default function Home() {
 
   if (state.phase === 'done') {
     return (
-      <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-4 px-6">
-        <h2 className="text-3xl font-black">Roast complete</h2>
-        <button className="rounded-lg bg-white px-5 py-2 font-semibold text-black" onClick={game.reset}>
-          Start over
-        </button>
-      </main>
+      <ResultScreen
+        cards={state.cards}
+        originalText={original}
+        finalText={game.finalText(original)}
+        onReset={game.reset}
+      />
     );
   }
 
