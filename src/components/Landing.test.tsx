@@ -50,10 +50,10 @@ describe('Landing', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/couldn't find any bullets/i);
   });
 
-  it('top-aligns the hero demo with the headline instead of centering it', () => {
+  it('vertically centers the hero demo against the headline and form column', () => {
     const { container } = render(<Landing onStart={() => {}} reducedMotion />);
     const grid = container.querySelector('h1')!.closest('section')!.firstElementChild!;
-    expect(grid.className).toContain('lg:items-start');
-    expect(grid.className).not.toContain('lg:items-center');
+    expect(grid.className).toContain('lg:items-center');
+    expect(grid.className).not.toContain('lg:items-start');
   });
 });

@@ -34,7 +34,7 @@ export function Landing({
       <SiteNav showLinks />
       <main>
         <section style={{ background: 'var(--hero-bg)', color: 'var(--hero-text)' }}>
-          <div className="mx-auto grid max-w-6xl gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16">
+          <div className="mx-auto grid max-w-6xl gap-12 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
             <div>
               <h1 className="text-5xl font-extrabold leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.25rem]">
                 <span className="block">Your resume, roasted.</span>
