@@ -9,6 +9,7 @@ import { streamRoast, RoastError } from '@/lib/client';
 import { useRoastGame } from '@/hooks/useRoastGame';
 import { REWRITE_MARK, TAGS_MARK } from '@/lib/streamFormat';
 import { ruleTip } from '@/lib/canned';
+import { MAX_BULLET_CHARS } from '@/lib/limits';
 
 const TEXT = '• Responsible for managing the release process\n• Helped with improving website speed';
 const VALID = `Bad.${REWRITE_MARK}Led releases for [N] teams.${TAGS_MARK}weak-phrase`;
@@ -103,5 +104,45 @@ describe('useRoastGame', () => {
     await card0Ready(h);
     act(() => h.result.current.reset());
     expect(h.result.current.state.phase).toBe('input');
+  });
+
+  it('shortens an over-long bullet before sending it', async () => {
+    mock.mockImplementation(validStream as never);
+    const long = `• Responsible for ${'managing many things '.repeat(25)}`;
+    const h = renderHook(() => useRoastGame({ scanDelayMs: 0 }));
+    act(() => h.result.current.start(long, 'high'));
+    await card0Ready(h);
+    expect(mock.mock.calls[0][0].bullet.length).toBeLessThanOrEqual(MAX_BULLET_CHARS);
+  });
+
+  it('a rejected request falls back for that card only and keeps AI on for the rest', async () => {
+    mock
+      .mockRejectedValueOnce(new RoastError('rejected', 'bad request'))
+      .mockImplementation(validStream as never);
+    const h = setup();
+    await card0Ready(h);
+    expect(h.result.current.state.cards[0].source).toBe('canned');
+    expect(h.result.current.state.aiAvailable).toBe(true);
+    act(() => h.result.current.next());
+    await waitFor(() => expect(h.result.current.state.cards[1].status).toBe('ready'));
+    expect(h.result.current.state.cards[1].source).toBe('ai');
+  });
+
+  it('an interrupted stream retries once and then falls back without turning AI off', async () => {
+    mock.mockRejectedValue(new RoastError('interrupted', 'cut'));
+    const h = setup();
+    await card0Ready(h);
+    expect(mock).toHaveBeenCalledTimes(2);
+    expect(h.result.current.state.cards[0].source).toBe('canned');
+    expect(h.result.current.state.aiAvailable).toBe(true);
+  });
+
+  it('a truncated card without tags is never shown as an ai rewrite', async () => {
+    mock.mockResolvedValue(`Bad.${REWRITE_MARK}Led releases for [N] tea`);
+    const h = setup();
+    await card0Ready(h);
+    const c = h.result.current.state.cards[0];
+    expect(c.source).toBe('canned');
+    expect(c.rewrite).not.toContain('tea');
   });
 });

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { cannedRoast, ruleTip } from '@/lib/canned';
 import { RoastError, streamRoast } from '@/lib/client';
 import { applyChoices, gameReducer, initialState, type Choice } from '@/lib/game';
+import { fitBullet } from '@/lib/limits';
 import { scanResume } from '@/lib/scanner';
 import { parseCard, splitPartial } from '@/lib/streamFormat';
 import type { Intensity, RuleId } from '@/lib/types';
@@ -55,7 +56,7 @@ export function useRoastGame({ scanDelayMs = 1500 }: { scanDelayMs?: number } = 
 
     const controller = new AbortController();
     abort.current = controller;
-    const req = { bullet: card.bullet.text, flags: card.bullet.flags, intensity };
+    const req = { bullet: fitBullet(card.bullet.text), flags: card.bullet.flags, intensity };
 
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -74,8 +75,12 @@ export function useRoastGame({ scanDelayMs = 1500 }: { scanDelayMs?: number } = 
         dispatch({ type: 'card-start', index });
       } catch (e) {
         if (myRun !== runId.current) return;
-        if (e instanceof RoastError) return fallback(true, NOTICE);
         if (e instanceof DOMException && e.name === 'AbortError') return;
+        if (e instanceof RoastError && e.kind === 'rejected') return fallback(false);
+        if (e instanceof RoastError && e.kind === 'interrupted') {
+          dispatch({ type: 'card-start', index });
+          continue;
+        }
         return fallback(true, NOTICE);
       }
     }

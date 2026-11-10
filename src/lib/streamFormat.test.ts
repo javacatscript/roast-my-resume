@@ -51,4 +51,8 @@ describe('parseCard', () => {
   it('returns null when more than 5 tags are given', () => {
     expect(parseCard(`Bad.${REWRITE_MARK}Better.${TAGS_MARK}a,b,c,d,e,f`)).toBeNull();
   });
+
+  it('returns null when the stream was cut off before the tags section', () => {
+    expect(parseCard(`Bad.${REWRITE_MARK}Led releases for [N] tea`)).toBeNull();
+  });
 });

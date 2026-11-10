@@ -29,10 +29,11 @@ export function parseCard(raw: string): CardResult | null {
   if (r === -1) return null;
   const after = raw.slice(r + REWRITE_MARK.length);
   const t = after.indexOf(TAGS_MARK);
-  const tagText = t === -1 ? '' : after.slice(t + TAGS_MARK.length);
+  if (t === -1) return null; // the stream was cut off before the end
+  const tagText = after.slice(t + TAGS_MARK.length);
   const parsed = cardSchema.safeParse({
     roast: raw.slice(0, r),
-    rewrite: t === -1 ? after : after.slice(0, t),
+    rewrite: after.slice(0, t),
     tags: tagText.split(',').map((s) => s.trim()).filter(Boolean),
   });
   return parsed.success ? parsed.data : null;
