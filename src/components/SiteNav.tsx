@@ -11,7 +11,7 @@ const LINKS = [
 
 export function SiteNav({ showLinks = false, children }: { showLinks?: boolean; children?: React.ReactNode }) {
   return (
-    <header className="border-b-2 border-edge bg-bg">
+    <header className="border-b border-rule bg-bg">
       <nav aria-label="Main" className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
         {/* A full reload is intended here: it also resets a game in progress. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

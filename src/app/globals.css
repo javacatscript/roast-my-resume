@@ -9,6 +9,7 @@
   --surface-2: #261e1b;
   --line: #3a2e29;
   --edge: #cbbdb4; /* heavy ink border */
+  --rule: #4a4644; /* thin grey divider */
   --shadow-color: #ff6a3d; /* hard offset shadow */
   --paper-shadow: #ff6a3d;
   --text: #f6efea;
@@ -32,6 +33,7 @@
   --surface-2: #f3efec;
   --line: #e3dcd7;
   --edge: #1b1412;
+  --rule: #d2cdca;
   --shadow-color: #1b1412;
   --paper-shadow: #1b1412;
   --text: #1b1412;
@@ -54,6 +56,7 @@
   --color-surface2: var(--surface-2);
   --color-line: var(--line);
   --color-edge: var(--edge);
+  --color-rule: var(--rule);
   --color-text: var(--text);
   --color-muted: var(--muted);
   --color-fire: var(--fire);
@@ -193,7 +196,7 @@ mark.pen {
   position: relative;
   background-color: var(--hero-flat);
   color: var(--hero-text);
-  border-bottom: 2px solid var(--edge);
+  border-bottom: 1px solid var(--rule);
   isolation: isolate;
 }
 .hero::before {
