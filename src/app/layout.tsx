@@ -16,7 +16,7 @@ const document_ = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Roast",
+  title: "Roast My Resume",
   description: "Drop in your resume. Get roasted, then fixed.",
 };
 

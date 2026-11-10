@@ -17,7 +17,7 @@ export function SiteNav({ showLinks = false, children }: { showLinks?: boolean; 
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fire">
           <Flame />
-          Resume Roast
+          Roast My Resume
         </a>
         <div className="flex items-center gap-1 sm:gap-2">
           {showLinks && (

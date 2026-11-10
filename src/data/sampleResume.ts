@@ -1,6 +1,6 @@
 // Fictional resume for the demo. Not a real person.
-export const SAMPLE_RESUME = `JORDAN EXAMPLE
-Frontend Engineer
+export const SAMPLE_RESUME = `John Doe
+Software Engineer
 
 EXPERIENCE
 Brightwave Software
