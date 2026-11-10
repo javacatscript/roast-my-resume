@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { keepOriginalMock } from '@/lib/canned';
 import type { GameCard } from '@/lib/game';
@@ -22,6 +22,12 @@ const btn =
 export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedMotion, isLast }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
+  const articleRef = useRef<HTMLElement>(null);
+  const primaryRef = useRef<HTMLButtonElement>(null);
+  const editRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  const draftRef = useRef<HTMLTextAreaElement>(null);
+  const wasEditing = useRef(false);
 
   const ready = card.status === 'ready';
   const canned = card.source === 'canned';
@@ -30,6 +36,27 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
   const roast = useTypewriter(card.roast, canned && ready && !reducedMotion);
   const typing = card.status === 'roasting' || (canned && ready && roast.length < card.roast.length);
   const shake = !reducedMotion && intensity === 'high' && ready && !canned;
+
+  // Keyboard flow: a new card takes focus, then hands it to the first action when it is ready,
+  // then to the continue button once a choice is made.
+  useEffect(() => {
+    articleRef.current?.focus({ preventScroll: true });
+  }, []);
+  useEffect(() => {
+    if (!ready || decided || praise || editing) return;
+    const active = document.activeElement;
+    if (!active || active === document.body || active === articleRef.current) {
+      (primaryRef.current ?? editRef.current)?.focus();
+    }
+  }, [ready, decided, praise, editing]);
+  useEffect(() => {
+    if (decided || praise) nextRef.current?.focus();
+  }, [decided, praise]);
+  useEffect(() => {
+    if (editing) draftRef.current?.focus();
+    else if (wasEditing.current) editRef.current?.focus();
+    wasEditing.current = editing;
+  }, [editing]);
 
   const enter = reducedMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
@@ -40,11 +67,16 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
 
   return (
     <motion.article
+      ref={articleRef}
+      tabIndex={-1}
       data-reduced-motion={String(reducedMotion)}
       {...enter}
       transition={{ type: 'spring', stiffness: 220, damping: 22 }}
       className="w-full rounded-2xl border border-white/10 bg-panel p-6 shadow-[0_0_40px_-18px_var(--roast)]"
     >
+      <div role="status" aria-live="polite" className="sr-only">
+        {ready ? `Roast: ${card.roast} ${canned ? 'Tip' : 'Rewrite'}: ${card.rewrite}` : ''}
+      </div>
       <p className="text-xs uppercase tracking-widest text-muted">Original</p>
       <p className="mt-1 text-lg">{card.bullet.text}</p>
 
@@ -84,6 +116,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
       {editing ? (
         <div className="mt-5 flex flex-col gap-3">
           <textarea
+            ref={draftRef}
             aria-label="Edit bullet"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -115,7 +148,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             {card.choice === 'rewrite' && 'Rewrite locked in.'}
             {card.choice === 'edited' && 'Your edit is saved.'}
           </p>
-          <button type="button" className={`${btn} border-white bg-white text-black`} onClick={onNext}>
+          <button ref={nextRef} type="button" className={`${btn} border-white bg-white text-black`} onClick={onNext}>
             {isLast ? 'See results' : 'Next bullet →'}
           </button>
         </div>
@@ -123,6 +156,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
         <div className="mt-5 flex flex-wrap gap-2">
           {!canned && (
             <button
+              ref={primaryRef}
               type="button"
               disabled={!ready}
               className={`${btn} border-rewrite bg-rewrite text-black`}
@@ -140,6 +174,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             Keep original
           </button>
           <button
+            ref={editRef}
             type="button"
             disabled={!ready}
             className={`${btn} border-white/20`}

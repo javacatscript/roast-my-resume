@@ -47,4 +47,12 @@ describe('buildMessages', () => {
     expect(user()).toContain('<bullet>Responsible for stuff</bullet>');
     expect(user()).toContain('uses the weak phrase "responsible for"');
   });
+
+  it('asks for a short roast so it fits the validation cap', () => {
+    expect(sys('high')).toMatch(/at most 300 characters/i);
+  });
+
+  it('asks that a rewrite never claims an outcome the user did not state', () => {
+    expect(sys('high')).toMatch(/never (claim|invent).*(result|outcome|impact)/i);
+  });
 });

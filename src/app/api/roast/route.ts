@@ -4,7 +4,7 @@ import { buildMessages } from '@/lib/prompt';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 // Confirm the current free-tier model id in the Groq console; override with GROQ_MODEL.
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+const DEFAULT_MODEL = 'qwen/qwen3.8-27b';
 const UPSTREAM_TIMEOUT_MS = 20000;
 
 const text = (status: number, message: string, headers: Record<string, string> = {}) =>

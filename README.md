@@ -34,7 +34,7 @@ cp .env.example .env.local   # then add your GROQ_API_KEY
 npm run dev
 ```
 
-Get a free key at [console.groq.com](https://console.groq.com). The default model is `llama-3.3-70b-versatile`. Groq's free-tier model list changes, so if it errors, set `GROQ_MODEL` to one that's currently available.
+Get a free key at [console.groq.com](https://console.groq.com). The default model is `qwen/qwen3.8-27b`. I started with a Llama model and it wasn't on my account's list, so check what yours has (`curl https://api.groq.com/openai/v1/models` with your key) and set `GROQ_MODEL` if the default errors. Avoid the `gpt-oss` models here. They spend tokens on hidden reasoning before they answer.
 
 Upstash is optional: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to get proper rate limiting.
 

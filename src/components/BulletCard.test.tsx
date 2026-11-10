@@ -92,4 +92,48 @@ describe('BulletCard', () => {
     await userEvent.click(screen.getByRole('button', { name: /see results/i }));
     expect(p.onNext).toHaveBeenCalled();
   });
+
+  describe('focus and announcements', () => {
+    it('focuses the card itself when a new card appears while it is still roasting', () => {
+      render(<BulletCard card={{ ...base, status: 'roasting', rewrite: '', roast: 'Wha' }} {...props()} />);
+      expect(screen.getByRole('article')).toHaveFocus();
+    });
+
+    it('moves focus to the first available action once the card is ready', () => {
+      const p = props();
+      const { rerender } = render(
+        <BulletCard card={{ ...base, status: 'roasting', rewrite: '', roast: 'Wha' }} {...p} />,
+      );
+      rerender(<BulletCard card={base} {...p} />);
+      expect(screen.getByRole('button', { name: /keep rewrite/i })).toHaveFocus();
+    });
+
+    it('moves focus to the continue button after a choice is made', () => {
+      const p = props();
+      const { rerender } = render(<BulletCard card={base} {...p} />);
+      rerender(<BulletCard card={{ ...base, choice: 'rewrite' }} {...p} />);
+      expect(screen.getByRole('button', { name: /next/i })).toHaveFocus();
+    });
+
+    it('focuses the edit box when editing starts and returns focus to Edit when cancelled', async () => {
+      render(<BulletCard card={base} {...props()} />);
+      await userEvent.click(screen.getByRole('button', { name: /edit/i }));
+      expect(screen.getByRole('textbox')).toHaveFocus();
+      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      expect(screen.getByRole('button', { name: /edit/i })).toHaveFocus();
+    });
+
+    it('announces the finished roast and rewrite once, politely, and nothing while streaming', () => {
+      const p = props();
+      const { rerender } = render(
+        <BulletCard card={{ ...base, status: 'roasting', rewrite: '', roast: 'Wha' }} {...p} />,
+      );
+      const region = screen.getByRole('status');
+      expect(region).toHaveAttribute('aria-live', 'polite');
+      expect(region).toHaveTextContent('');
+      rerender(<BulletCard card={base} {...p} />);
+      expect(screen.getByRole('status')).toHaveTextContent('What are you DOING?');
+      expect(screen.getByRole('status')).toHaveTextContent('Led a team of [N] engineers');
+    });
+  });
 });
