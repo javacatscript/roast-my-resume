@@ -17,7 +17,8 @@ interface Props {
 }
 
 const btn =
-  'rounded-lg border px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40';
+  'rounded-xl border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire disabled:cursor-not-allowed disabled:opacity-40';
+const quiet = `${btn} border-line bg-surface2 text-text enabled:hover:border-fire`;
 
 export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedMotion, isLast }: Props) {
   const [editing, setEditing] = useState(false);
@@ -60,10 +61,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
 
   const enter = reducedMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
-    : {
-        initial: { opacity: 0, y: 40, scale: 0.94 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-      };
+    : { initial: { opacity: 0, y: 40, scale: 0.94 }, animate: { opacity: 1, y: 0, scale: 1 } };
 
   return (
     <motion.article
@@ -72,24 +70,31 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
       data-reduced-motion={String(reducedMotion)}
       {...enter}
       transition={{ type: 'spring', stiffness: 220, damping: 22 }}
-      className="w-full rounded-2xl border border-white/10 bg-panel p-6 shadow-[0_0_40px_-18px_var(--roast)]"
+      className="w-full rounded-[1.5rem] border border-line bg-surface p-5 shadow-[var(--glow)] outline-none sm:p-7"
     >
       <div role="status" aria-live="polite" className="sr-only">
         {ready ? `Roast: ${card.roast} ${canned ? 'Tip' : 'Rewrite'}: ${card.rewrite}` : ''}
       </div>
-      <p className="text-xs uppercase tracking-widest text-muted">Original</p>
-      <p className="mt-1 text-lg">{card.bullet.text}</p>
+
+      <div className="rounded-md bg-[#fffdf9] px-5 py-4 text-[#1b1412] shadow-sm">
+        <p className="text-xs font-semibold text-[#8a7e77]">Original</p>
+        <p className="doc mt-1 text-lg leading-snug">{card.bullet.text}</p>
+      </div>
 
       <motion.div
         data-shake={shake ? 'true' : undefined}
         animate={shake ? { x: [0, -8, 8, -5, 5, 0] } : { x: 0 }}
         transition={{ duration: 0.45 }}
-        className="mt-5 rounded-xl border border-roast/30 bg-roast/10 p-4"
+        className="mt-4 border-l-2 border-roast pl-4"
       >
-        <p className="text-xs uppercase tracking-widest text-roast">Roast</p>
-        <p className="mt-1 min-h-6 text-roast/95">
+        <p className="text-xs font-semibold text-roast">Roast</p>
+        <p className="mt-1 min-h-6 text-[17px] font-medium leading-snug text-roast">
           {roast}
-          {typing && <span aria-hidden className="ml-0.5 inline-block w-2 animate-pulse bg-roast">&nbsp;</span>}
+          {typing && (
+            <span aria-hidden className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-roast motion-safe:animate-pulse">
+              &nbsp;
+            </span>
+          )}
         </p>
       </motion.div>
 
@@ -99,17 +104,15 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
           animate={reducedMotion ? { opacity: 1 } : { opacity: 1, rotateX: 0 }}
           transition={{ type: 'spring', stiffness: 160, damping: 18, delay: reducedMotion ? 0 : 0.3 }}
           style={{ transformPerspective: 900 }}
-          className="mt-4 rounded-xl border border-rewrite/30 bg-rewrite/10 p-4"
+          className="mt-4 rounded-xl bg-rewrite/12 p-4 ring-1 ring-rewrite/30"
         >
-          <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-rewrite">
+          <p className="flex items-center gap-2 text-xs font-semibold text-rewrite">
             {canned ? 'Tip' : 'Rewrite'}
             {canned && !praise && (
-              <span className="rounded bg-white/10 px-2 py-0.5 normal-case tracking-normal text-muted">
-                AI unavailable
-              </span>
+              <span className="rounded bg-surface2 px-2 py-0.5 font-medium text-muted">AI unavailable</span>
             )}
           </p>
-          <p className="mt-1 text-rewrite">{card.rewrite}</p>
+          <p className="doc mt-1 text-lg leading-snug text-text">{card.rewrite}</p>
         </motion.div>
       )}
 
@@ -121,12 +124,12 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             rows={3}
-            className="w-full rounded-lg border border-white/15 bg-panel2 p-3 text-sm"
+            className="doc w-full rounded-xl border border-line bg-bg p-3 text-base text-text focus-visible:outline-2 focus-visible:outline-fire"
           />
           <div className="flex gap-2">
             <button
               type="button"
-              className={`${btn} border-rewrite bg-rewrite text-black`}
+              className={`${btn} fire-fill border-transparent`}
               disabled={!draft.trim()}
               onClick={() => {
                 onEdit(draft.trim());
@@ -135,7 +138,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             >
               Save
             </button>
-            <button type="button" className={`${btn} border-white/15`} onClick={() => setEditing(false)}>
+            <button type="button" className={quiet} onClick={() => setEditing(false)}>
               Cancel
             </button>
           </div>
@@ -148,7 +151,7 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             {card.choice === 'rewrite' && 'Rewrite locked in.'}
             {card.choice === 'edited' && 'Your edit is saved.'}
           </p>
-          <button ref={nextRef} type="button" className={`${btn} border-white bg-white text-black`} onClick={onNext}>
+          <button ref={nextRef} type="button" className={`${btn} fire-fill border-transparent`} onClick={onNext}>
             {isLast ? 'See results' : 'Next bullet →'}
           </button>
         </div>
@@ -159,25 +162,20 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
               ref={primaryRef}
               type="button"
               disabled={!ready}
-              className={`${btn} border-rewrite bg-rewrite text-black`}
+              className={`${btn} border-transparent bg-rewrite text-bg enabled:hover:brightness-110`}
               onClick={() => onChoose('rewrite')}
             >
               Keep rewrite
             </button>
           )}
-          <button
-            type="button"
-            disabled={!ready}
-            className={`${btn} border-white/20`}
-            onClick={() => onChoose('original')}
-          >
+          <button type="button" disabled={!ready} className={quiet} onClick={() => onChoose('original')}>
             Keep original
           </button>
           <button
             ref={editRef}
             type="button"
             disabled={!ready}
-            className={`${btn} border-white/20`}
+            className={quiet}
             onClick={() => {
               setDraft(canned ? card.bullet.text : card.rewrite);
               setEditing(true);

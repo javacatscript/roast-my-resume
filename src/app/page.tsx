@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { AnimatePresence, useReducedMotion } from 'motion/react';
 import { BossBar } from '@/components/BossBar';
 import { BulletCard } from '@/components/BulletCard';
+import { Landing } from '@/components/Landing';
 import { ResultScreen } from '@/components/ResultScreen';
 import { ScanView } from '@/components/ScanView';
-import { UploadScreen } from '@/components/UploadScreen';
+import { SiteNav } from '@/components/SiteNav';
 import { useRoastGame } from '@/hooks/useRoastGame';
 
 export default function Home() {
@@ -17,7 +18,8 @@ export default function Home() {
 
   if (state.phase === 'input') {
     return (
-      <UploadScreen
+      <Landing
+        reducedMotion={reducedMotion}
         message={state.notice}
         onStart={(text, intensity) => {
           setOriginal(text);
@@ -27,48 +29,52 @@ export default function Home() {
     );
   }
 
-  if (state.phase === 'scanning') return <ScanView text={original} reducedMotion={reducedMotion} />;
-
-  if (state.phase === 'done') {
-    return (
-      <ResultScreen
-        cards={state.cards}
-        originalText={original}
-        finalText={game.finalText(original)}
-        onReset={game.reset}
-      />
-    );
-  }
-
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-6 py-10">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <BossBar current={state.index + 1} total={state.cards.length} />
-        </div>
-        <button onClick={game.reset} className="text-xs text-muted underline hover:text-text">
-          Quit
-        </button>
-      </div>
-      {state.notice && (
-        <p role="status" className="rounded-lg border border-white/10 bg-panel2 px-4 py-2 text-sm text-muted">
-          {state.notice}
-        </p>
-      )}
-      <AnimatePresence mode="wait">
-        {card && (
-          <BulletCard
-            key={state.index}
-            card={card}
-            intensity={state.intensity}
-            reducedMotion={reducedMotion}
-            isLast={state.index === state.cards.length - 1}
-            onChoose={game.choose}
-            onEdit={game.saveEdit}
-            onNext={game.next}
+    <>
+      <SiteNav>
+        {state.phase === 'playing' && (
+          <button onClick={game.reset} className="rounded-lg px-3 py-2 text-sm text-muted underline underline-offset-4 hover:text-text focus-visible:outline-2 focus-visible:outline-fire">
+            Quit
+          </button>
+        )}
+      </SiteNav>
+      <main>
+        {state.phase === 'scanning' && <ScanView text={original} reducedMotion={reducedMotion} />}
+
+        {state.phase === 'done' && (
+          <ResultScreen
+            cards={state.cards}
+            originalText={original}
+            finalText={game.finalText(original)}
+            onReset={game.reset}
           />
         )}
-      </AnimatePresence>
-    </main>
+
+        {state.phase === 'playing' && (
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 py-10 sm:px-8">
+            <BossBar current={state.index + 1} total={state.cards.length} />
+            {state.notice && (
+              <p role="status" className="rounded-xl border border-line bg-surface2 px-4 py-2.5 text-sm text-muted">
+                {state.notice}
+              </p>
+            )}
+            <AnimatePresence mode="wait">
+              {card && (
+                <BulletCard
+                  key={state.index}
+                  card={card}
+                  intensity={state.intensity}
+                  reducedMotion={reducedMotion}
+                  isLast={state.index === state.cards.length - 1}
+                  onChoose={game.choose}
+                  onEdit={game.saveEdit}
+                  onNext={game.next}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </main>
+    </>
   );
 }

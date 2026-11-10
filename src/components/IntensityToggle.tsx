@@ -2,21 +2,15 @@
 import type { Intensity } from '@/lib/types';
 
 const OPTIONS: { value: Intensity; label: string; hint: string }[] = [
-  { value: 'mild', label: 'Mild', hint: '' },
-  { value: 'medium', label: 'Medium', hint: '' },
-  { value: 'high', label: 'High', hint: '' },
+  { value: 'mild', label: 'Mild', hint: 'gentle teasing' },
+  { value: 'medium', label: 'Medium', hint: 'sarcastic' },
+  { value: 'high', label: 'High', hint: 'no mercy' },
 ];
 
-export function IntensityToggle({
-  value,
-  onChange,
-}: {
-  value: Intensity;
-  onChange: (i: Intensity) => void;
-}) {
+export function IntensityToggle({ value, onChange }: { value: Intensity; onChange: (i: Intensity) => void }) {
   return (
-    <div role="radiogroup" aria-label="Roast intensity" className="flex gap-2">
-      {OPTIONS.map((o) => {
+    <div role="radiogroup" aria-label="Roast intensity" className="inline-flex rounded-xl border border-line bg-surface2 p-1">
+      {OPTIONS.map((o, i) => {
         const active = o.value === value;
         return (
           <button
@@ -24,15 +18,23 @@ export function IntensityToggle({
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(o.value)}
-            className={`rounded-lg border px-4 py-2 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-roast ${
-              active
-                ? 'border-roast bg-roast/15 text-text shadow-[0_0_18px_-4px_var(--roast)]'
-                : 'border-white/10 bg-panel text-muted hover:border-white/25'
+            onKeyDown={(e) => {
+              const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+              if (!d) return;
+              e.preventDefault();
+              const next = OPTIONS[(i + d + OPTIONS.length) % OPTIONS.length].value;
+              onChange(next);
+              (e.currentTarget.parentElement?.querySelector(`[data-v="${next}"]`) as HTMLElement | null)?.focus();
+            }}
+            data-v={o.value}
+            className={`whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-fire ${
+              active ? 'fire-fill shadow-[var(--glow)]' : 'text-muted hover:text-text'
             }`}
           >
-            <span className="font-semibold">{o.label}</span>
-            <span className="ml-2 hidden text-xs opacity-70 sm:inline">{o.hint}</span>
+            {o.label}
+            <span className="ml-1.5 hidden text-xs font-normal opacity-80 md:inline">{o.hint}</span>
           </button>
         );
       })}

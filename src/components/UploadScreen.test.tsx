@@ -21,14 +21,14 @@ describe('UploadScreen', () => {
 
   it('disables Start for empty text', () => {
     render(<UploadScreen onStart={() => {}} />);
-    expect(screen.getByRole('button', { name: /start/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /let's begin/i })).toBeDisabled();
   });
 
   it('starts with the sample resume at high intensity', async () => {
     const onStart = vi.fn();
     render(<UploadScreen onStart={onStart} />);
     await userEvent.click(screen.getByRole('button', { name: /try the sample/i }));
-    await userEvent.click(screen.getByRole('button', { name: /start/i }));
+    await userEvent.click(screen.getByRole('button', { name: /let's begin/i }));
     expect(onStart).toHaveBeenCalledWith(SAMPLE_RESUME, 'high');
   });
 
@@ -37,7 +37,7 @@ describe('UploadScreen', () => {
     render(<UploadScreen onStart={onStart} />);
     await userEvent.click(screen.getByRole('radio', { name: /mild/i }));
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '• Did a thing for many users' } });
-    await userEvent.click(screen.getByRole('button', { name: /start/i }));
+    await userEvent.click(screen.getByRole('button', { name: /let's begin/i }));
     expect(onStart).toHaveBeenCalledWith('• Did a thing for many users', 'mild');
   });
 
@@ -45,7 +45,7 @@ describe('UploadScreen', () => {
     render(<UploadScreen onStart={() => {}} />);
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a'.repeat(MAX_RESUME_CHARS + 1) } });
     expect(screen.getByRole('alert')).toHaveTextContent(/too long/i);
-    expect(screen.getByRole('button', { name: /start/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /let's begin/i })).toBeDisabled();
   });
 
   it('shows the no-text-layer message for an image-only pdf', async () => {

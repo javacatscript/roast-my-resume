@@ -6,6 +6,9 @@ import { MAX_RESUME_CHARS } from '@/lib/limits';
 import { NoTextLayerError, extractPdfText } from '@/lib/pdf';
 import type { Intensity } from '@/lib/types';
 
+const secondary =
+  'cursor-pointer rounded-xl border border-line bg-surface2 px-4 py-2.5 text-sm font-semibold text-text transition hover:border-fire focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-fire';
+
 export function UploadScreen({
   onStart,
   message,
@@ -25,7 +28,8 @@ export function UploadScreen({
     : (pdfError ?? message ?? null);
   const canStart = text.trim().length > 0 && !tooLong && !busy;
 
-  async function onFile(file: File | undefined) {
+  async function onFile(input: HTMLInputElement) {
+    const file = input.files?.[0];
     if (!file) return;
     setPdfError(null);
     setBusy(true);
@@ -39,72 +43,57 @@ export function UploadScreen({
       );
     } finally {
       setBusy(false);
+      input.value = ''; // lets the same file be chosen again after an error
     }
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-6 py-12">
-      <header>
-        <h1 className="text-5xl font-black tracking-tight">
-          <span className="text-roast drop-shadow-[0_0_18px_var(--roast)]">Roast</span> my resume
-        </h1>
-        <p className="mt-3 text-muted">
-          Drop in your resume. Every weak bullet gets roasted, then fixed. Brace yourself.
-        </p>
-      </header>
-
+    <div className="rounded-[1.5rem] border border-line bg-surface p-4 text-text shadow-[var(--glow)] sm:p-5">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Paste your resume here…"
+        placeholder="Paste your resume here, one bullet per line…"
         aria-label="Resume text"
-        rows={12}
-        className="w-full rounded-xl border border-white/10 bg-panel p-4 font-mono text-sm text-text placeholder:text-muted focus-visible:outline-2 focus-visible:outline-roast"
+        rows={4}
+        className="w-full resize-y rounded-xl border border-line bg-bg p-4 text-[15px] leading-relaxed text-text placeholder:text-muted focus-visible:outline-2 focus-visible:outline-fire"
       />
 
-      <div className="flex flex-wrap items-center gap-3">
-        <label
-          htmlFor={fileId}
-          className="cursor-pointer rounded-lg border border-white/10 bg-panel px-4 py-2 text-sm hover:border-white/25 focus-within:outline-2 focus-within:outline-roast"
-        >
+      <div className="mt-3 flex flex-wrap items-center gap-2.5">
+        <label htmlFor={fileId} className={secondary}>
           Upload PDF
         </label>
-        <input
-          id={fileId}
-          type="file"
-          accept="application/pdf"
-          className="sr-only"
-          onChange={(e) => onFile(e.target.files?.[0])}
-        />
+        <input id={fileId} type="file" accept="application/pdf" className="sr-only" onChange={(e) => onFile(e.target)} />
         <button
           type="button"
           onClick={() => {
             setPdfError(null);
             setText(SAMPLE_RESUME);
           }}
-          className="rounded-lg border border-white/10 bg-panel px-4 py-2 text-sm hover:border-white/25"
+          className={secondary}
         >
           Try the sample
         </button>
       </div>
 
       {error && (
-        <p role="alert" className="text-sm text-roast">
+        <p role="alert" className="mt-3 text-sm font-medium text-roast">
           {error}
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
         <IntensityToggle value={intensity} onChange={setIntensity} />
         <button
           type="button"
           disabled={!canStart}
           onClick={() => onStart(text, intensity)}
-          className="rounded-lg bg-roast px-6 py-3 font-bold text-black transition enabled:hover:shadow-[0_0_28px_var(--roast)] disabled:cursor-not-allowed disabled:opacity-40"
+          className="fire-fill rounded-xl px-6 py-3 font-bold transition enabled:hover:-translate-y-0.5 enabled:hover:shadow-[var(--glow)] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fire"
         >
-          Start the roast
+          Let&apos;s Begin
         </button>
       </div>
-    </main>
+
+      <p className="mt-4 text-xs text-muted">Your resume is sent to Groq to generate the roast. It isn&apos;t stored.</p>
+    </div>
   );
 }
