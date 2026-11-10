@@ -55,4 +55,8 @@ describe('buildMessages', () => {
   it('asks that a rewrite never claims an outcome the user did not state', () => {
     expect(sys('high')).toMatch(/never (claim|invent).*(result|outcome|impact)/i);
   });
+
+  it('does not show angle-bracket placeholders the model could copy into its answer', () => {
+    expect(sys('high')).not.toMatch(/<roast text>|<rewritten bullet>|<up to 5/i);
+  });
 });

@@ -24,6 +24,9 @@ const cardSchema = z.object({
   tags: z.array(z.string().trim().min(1).max(40)).max(5),
 });
 
+const ECHO = /^\s*<(?:roast text|rewritten bullet|roast|rewrite)>\s*/i;
+const clean = (t: string) => t.replace(ECHO, '');
+
 export function parseCard(raw: string): CardResult | null {
   const r = raw.indexOf(REWRITE_MARK);
   if (r === -1) return null;
@@ -32,8 +35,8 @@ export function parseCard(raw: string): CardResult | null {
   if (t === -1) return null; // the stream was cut off before the end
   const tagText = after.slice(t + TAGS_MARK.length);
   const parsed = cardSchema.safeParse({
-    roast: raw.slice(0, r),
-    rewrite: after.slice(0, t),
+    roast: clean(raw.slice(0, r)),
+    rewrite: clean(after.slice(0, t)),
     tags: tagText.split(',').map((s) => s.trim()).filter(Boolean),
   });
   return parsed.success ? parsed.data : null;

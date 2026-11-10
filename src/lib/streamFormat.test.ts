@@ -55,4 +55,9 @@ describe('parseCard', () => {
   it('returns null when the stream was cut off before the tags section', () => {
     expect(parseCard(`Bad.${REWRITE_MARK}Led releases for [N] tea`)).toBeNull();
   });
+
+  it('strips a copied template placeholder from the start of the roast and rewrite', () => {
+    const raw = `<roast text> Bad bullet.${REWRITE_MARK}<rewritten bullet> Led 5 engineers.${TAGS_MARK}weak-phrase`;
+    expect(parseCard(raw)).toEqual({ roast: 'Bad bullet.', rewrite: 'Led 5 engineers.', tags: ['weak-phrase'] });
+  });
 });
