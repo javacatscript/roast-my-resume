@@ -41,7 +41,10 @@ export function Landing({
                 <span className="block">Then rewritten.</span>
               </h1>
               <p className="mt-5 max-w-[34rem] text-lg leading-relaxed" style={{ color: 'var(--hero-muted)' }}>
-                Each weak bullet gets roasted live, rewritten with a placeholder for the metrics you were too shy to include.
+                <span className="sm:hidden">Weak bullets get roasted live, rewritten with metrics you were too shy to add.</span>
+                <span className="hidden sm:inline">
+                  Each weak bullet gets roasted live, rewritten with a placeholder for the metrics you were too shy to include.
+                </span>
               </p>
               <div className="mt-6">
                 <UploadScreen onStart={onStart} message={message} />
