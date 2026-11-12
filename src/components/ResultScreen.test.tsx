@@ -60,10 +60,21 @@ describe('ResultScreen', () => {
     URL.revokeObjectURL = vi.fn();
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
     render(<ResultScreen {...props([card('one')])} />);
-    await userEvent.click(screen.getByRole('button', { name: /download/i }));
+    await userEvent.click(screen.getByRole('button', { name: /download \.txt/i }));
     expect(click).toHaveBeenCalled();
     const anchor = click.mock.contexts[0] as HTMLAnchorElement;
     expect(anchor.download).toBe('resume-roasted.txt');
+  });
+
+  it('downloads resume-roasted.pdf', async () => {
+    URL.createObjectURL = vi.fn(() => 'blob:x');
+    URL.revokeObjectURL = vi.fn();
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    render(<ResultScreen {...props([card('one')])} />);
+    await userEvent.click(screen.getByRole('button', { name: /download pdf/i }));
+    await vi.waitFor(() => expect(click).toHaveBeenCalled());
+    const anchor = click.mock.contexts.at(-1) as HTMLAnchorElement;
+    expect(anchor.download).toBe('resume-roasted.pdf');
   });
 
   it('calls onReset from Start over', async () => {

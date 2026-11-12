@@ -1,6 +1,9 @@
 'use client';
+import { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { Spinner } from '@/components/Spinner';
 import { Stamp } from '@/components/Stamp';
+import { buildResumePdf } from '@/lib/resumePdf';
 import { verdict } from '@/lib/verdict';
 import type { GameCard } from '@/lib/game';
 
@@ -24,13 +27,28 @@ export function ResultScreen({ cards: allCards, finalText, onReset }: Props) {
   const reducedMotion = useReducedMotion() ?? false;
   const v = verdict(allCards);
   const cards = allCards.filter((c) => c.bullet.flags.length > 0);
-  function download() {
-    const url = URL.createObjectURL(new Blob([finalText], { type: 'text/plain' }));
+  const [makingPdf, setMakingPdf] = useState(false);
+  const [pdfFailed, setPdfFailed] = useState(false);
+
+  function save(blob: Blob, name: string) {
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'resume-roasted.txt';
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
+  }
+  const download = () => save(new Blob([finalText], { type: 'text/plain' }), 'resume-roasted.txt');
+  async function downloadPdf() {
+    setMakingPdf(true);
+    setPdfFailed(false);
+    try {
+      save(await buildResumePdf(finalText), 'resume-roasted.pdf');
+    } catch {
+      setPdfFailed(true);
+    } finally {
+      setMakingPdf(false);
+    }
   }
 
   return (
@@ -88,9 +106,19 @@ export function ResultScreen({ cards: allCards, finalText, onReset }: Props) {
         })}
       </ul>
 
+      {pdfFailed && (
+        <p role="alert" className="text-sm font-medium text-roast">
+          Couldn&apos;t make the PDF. Try the .txt download instead.
+        </p>
+      )}
+
       <div className="flex flex-wrap gap-3">
         <button type="button" className={`${btn} fire-fill`} onClick={() => navigator.clipboard.writeText(finalText)}>
           Copy resume
+        </button>
+        <button type="button" className={`${btn} inline-flex items-center gap-2`} onClick={downloadPdf} disabled={makingPdf}>
+          {makingPdf && <Spinner />}
+          {makingPdf ? 'Making PDF…' : 'Download PDF'}
         </button>
         <button type="button" className={btn} onClick={download}>
           Download .txt
