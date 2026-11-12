@@ -28,6 +28,16 @@ describe('BulletCard', () => {
     expect(screen.getByRole('button', { name: /edit/i })).toBeDisabled();
   });
 
+  it('shows loaders while waiting on the AI and removes them once ready', () => {
+    const { container, rerender } = render(
+      <BulletCard card={{ ...base, status: 'roasting', rewrite: '', roast: '' }} {...props()} />,
+    );
+    expect(container.querySelector('[data-loading="roast"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-loading="rewrite"]')).toBeInTheDocument();
+    rerender(<BulletCard card={base} {...props()} />);
+    expect(container.querySelector('[data-spinner]')).not.toBeInTheDocument();
+  });
+
   it('offers keyboard-focusable choices once ready and reports them', async () => {
     const p = props();
     render(<BulletCard card={base} {...p} />);

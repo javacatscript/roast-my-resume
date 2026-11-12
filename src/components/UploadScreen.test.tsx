@@ -6,6 +6,7 @@ vi.mock('@/lib/pdf', async () => {
   class NoTextLayerError extends Error {}
   return { NoTextLayerError, extractPdfText: vi.fn().mockRejectedValue(new NoTextLayerError()) };
 });
+import { extractPdfText } from '@/lib/pdf';
 import { UploadScreen } from '@/components/UploadScreen';
 import { SAMPLE_RESUME } from '@/data/sampleResume';
 import { MAX_RESUME_CHARS } from '@/lib/limits';
@@ -17,6 +18,20 @@ describe('UploadScreen', () => {
     expect(screen.getByLabelText(/upload pdf/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /try the sample/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /high/i })).toBeChecked();
+  });
+
+  it('shows a loader and blocks Start while a PDF is being read', async () => {
+    let finish!: (t: string) => void;
+    vi.mocked(extractPdfText).mockImplementationOnce(() => new Promise<string>((r) => (finish = r)));
+    const { container } = render(<UploadScreen onStart={() => {}} />);
+    const file = new File(['x'], 'cv.pdf', { type: 'application/pdf' });
+    await userEvent.upload(screen.getByLabelText(/upload pdf/i), file);
+    expect(await screen.findByText(/reading pdf/i)).toBeInTheDocument();
+    expect(container.querySelector('[data-spinner]')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /let's begin/i })).toBeDisabled();
+    finish('• Did a thing');
+    expect(await screen.findByText(/upload pdf/i)).toBeInTheDocument();
+    expect(container.querySelector('[data-spinner]')).not.toBeInTheDocument();
   });
 
   it('disables Start for empty text', () => {

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { Marked } from '@/components/Marked';
+import { Spinner } from '@/components/Spinner';
 import { Stamp } from '@/components/Stamp';
 import { keepOriginalMock } from '@/lib/canned';
 import type { GameCard } from '@/lib/game';
@@ -108,6 +109,11 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
         </svg>
         <p>
           {roast}
+          {card.status === 'roasting' && !roast && (
+            <span data-loading="roast" className="inline-flex items-center gap-2 text-base text-muted">
+              <Spinner /> Sharpening the red pen…
+            </span>
+          )}
           {typing && (
             <span aria-hidden className="ml-0.5 inline-block h-5 w-2 translate-y-0.5 bg-roast motion-safe:animate-pulse">
               &nbsp;
@@ -137,6 +143,18 @@ export function BulletCard({ card, intensity, onChoose, onEdit, onNext, reducedM
             {card.rewrite}
           </p>
         </motion.div>
+      )}
+
+      {card.status === 'roasting' && (
+        <div data-loading="rewrite" aria-hidden className="mt-6 pl-6">
+          <p className="flex items-center gap-2 text-xs font-semibold text-rewrite">
+            <Spinner /> Writing a better version…
+          </p>
+          <div className="mt-2 space-y-2">
+            <div className="h-5 w-full animate-pulse rounded-sm bg-[#d8f5e8]" />
+            <div className="h-5 w-2/3 animate-pulse rounded-sm bg-[#d8f5e8]" />
+          </div>
+        </div>
       )}
 
       {editing ? (

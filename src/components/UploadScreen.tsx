@@ -1,6 +1,7 @@
 'use client';
 import { useId, useState } from 'react';
 import { IntensityToggle } from '@/components/IntensityToggle';
+import { Spinner } from '@/components/Spinner';
 import { SAMPLE_RESUME } from '@/data/sampleResume';
 import { MAX_RESUME_CHARS } from '@/lib/limits';
 import { NoTextLayerError, extractPdfText } from '@/lib/pdf';
@@ -55,14 +56,27 @@ export function UploadScreen({
         placeholder="Paste your resume here, one bullet per line…"
         aria-label="Resume text"
         rows={4}
+        aria-busy={busy}
         className="w-full resize-y rounded-[5px] border-2 border-edge bg-bg p-4 text-[15px] leading-relaxed text-text placeholder:text-muted focus-visible:outline-2 focus-visible:outline-fire"
       />
 
       <div className="mt-3 flex flex-wrap items-center gap-2.5">
-        <label htmlFor={fileId} className={secondary}>
-          Upload PDF
+        <label
+          htmlFor={fileId}
+          aria-disabled={busy}
+          className={`${secondary} inline-flex items-center gap-2 ${busy ? 'pointer-events-none opacity-70' : ''}`}
+        >
+          {busy && <Spinner />}
+          {busy ? 'Reading PDF…' : 'Upload PDF'}
         </label>
-        <input id={fileId} type="file" accept="application/pdf" className="sr-only" onChange={(e) => onFile(e.target)} />
+        <input
+          id={fileId}
+          type="file"
+          accept="application/pdf"
+          disabled={busy}
+          className="sr-only"
+          onChange={(e) => onFile(e.target)}
+        />
         <button
           type="button"
           onClick={() => {
@@ -74,6 +88,12 @@ export function UploadScreen({
           Try the sample
         </button>
       </div>
+
+      {busy && (
+        <p role="status" className="sr-only">
+          Reading your PDF…
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="mt-3 text-sm font-medium text-roast">

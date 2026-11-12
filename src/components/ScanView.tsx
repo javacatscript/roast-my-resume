@@ -1,5 +1,6 @@
 'use client';
 import { motion } from 'motion/react';
+import { Spinner } from '@/components/Spinner';
 
 // A ragged top edge for the char line, so it reads as burnt paper and not a gradient wipe.
 const RAGGED =
@@ -9,7 +10,8 @@ export function ScanView({ text, reducedMotion }: { text: string; reducedMotion:
   const lines = text.split(/\r?\n/).filter((l) => l.trim()).slice(0, 14);
   return (
     <div className="mx-auto w-full max-w-2xl px-5 py-12 sm:px-8">
-      <p role="status" className="mb-5 text-lg font-bold">
+      <p role="status" className="mb-5 flex items-center gap-2.5 text-lg font-bold">
+        <Spinner className="text-fire" />
         Scanning for crimes against writing…
       </p>
       <div className="paper doc relative overflow-hidden p-6 text-[15px] leading-7 sm:p-8">
